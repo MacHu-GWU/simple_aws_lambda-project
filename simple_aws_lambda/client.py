@@ -1,23 +1,13 @@
 # -*- coding: utf-8 -*-
+
 """
-Client utilities for interacting with AWS Lambda Layers via the boto3 Lambda client.
+Improve the original redshift boto3 API.
 
-This module provides functions to:
-- List available Lambda layers in an AWS account.
-- List versions of a specific Lambda layer.
-- Retrieve details for a specific Lambda layer version.
+Ref:
 
-All functions require a boto3 Lambda client and support optional filtering by runtime,
-architecture, and pagination.
-
-References:
-- AWS Lambda boto3 documentation: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/lambda.html
-
-Exports:
-- list_layers
-- list_layer_versions
-- get_layer_version
+- https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/lambda.html
 """
+
 import typing as T
 
 import botocore.exceptions
@@ -71,6 +61,7 @@ def list_layers(
 
 def list_layer_versions(
     lambda_client: "LambdaClient",
+    layer_name: str,
     compatible_runtime: str = OPT,
     compatible_architecture: str = OPT,
     max_items: int = 9999,
@@ -87,6 +78,7 @@ def list_layer_versions(
         paginator = lambda_client.get_paginator("list_layer_versions")
         response_iterator = paginator.paginate(
             **remove_optional(
+                LayerName=layer_name,
                 CompatibleRuntime=compatible_runtime,
                 CompatibleArchitecture=compatible_architecture,
                 PaginationConfig={
@@ -123,5 +115,4 @@ def get_layer_version(
     except botocore.exceptions.ClientError as e:
         if e.response["Error"]["Code"] == "ResourceNotFoundException":
             return None
-        else:
-            raise e
+        raise  # pragma: no cover

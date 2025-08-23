@@ -169,6 +169,7 @@ class TestLayerVersion:
                 "Version": 1,
             }
         )
+        assert obj_empty.layer_name == "my-layer"
         _ = obj_empty.content
         _ = obj_empty.has_content_details
         _ = obj_empty.has_python_runtime
