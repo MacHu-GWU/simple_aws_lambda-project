@@ -8,6 +8,7 @@ import typing as T
 import dataclasses
 
 from func_args.api import T_KWARGS, REQ
+from iterproxy import IterProxy
 
 if T.TYPE_CHECKING:  # pragma: no cover
     from mypy_boto3_lambda.type_defs import (
@@ -176,6 +177,10 @@ class Layer(Base):
             "layer_name": self.layer_name,
             "layer_arn": self.layer_arn,
         }
+
+
+class LayerIterproxy(IterProxy[Layer]):
+    pass
 
 
 @dataclasses.dataclass(frozen=True)
@@ -421,3 +426,7 @@ class LayerVersion(Base):
             "compatible_runtimes": self.compatible_runtimes,
             "compatible_architectures": self.compatible_architectures,
         }
+
+
+class LayerVersionIterproxy(IterProxy[LayerVersion]):
+    pass
