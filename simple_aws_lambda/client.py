@@ -1,5 +1,23 @@
 # -*- coding: utf-8 -*-
+"""
+Client utilities for interacting with AWS Lambda Layers via the boto3 Lambda client.
 
+This module provides functions to:
+- List available Lambda layers in an AWS account.
+- List versions of a specific Lambda layer.
+- Retrieve details for a specific Lambda layer version.
+
+All functions require a boto3 Lambda client and support optional filtering by runtime,
+architecture, and pagination.
+
+References:
+- AWS Lambda boto3 documentation: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/lambda.html
+
+Exports:
+- list_layers
+- list_layer_versions
+- get_layer_version
+"""
 import typing as T
 
 import botocore.exceptions
@@ -25,6 +43,8 @@ def list_layers(
     max_items: int = 9999,
 ) -> LayerIterproxy:
     """
+    List available AWS Lambda layers in the account.
+
     Ref:
 
     - `list_layers <https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/lambda/client/list_layers.html>`_
@@ -56,6 +76,8 @@ def list_layer_versions(
     max_items: int = 9999,
 ):
     """
+    List all versions of Lambda layers in the account.
+
     Ref:
 
     - `list_layer_versions <https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/lambda/client/list_layer_versions.html>`_
@@ -86,6 +108,8 @@ def get_layer_version(
     version_number: int,
 ) -> LayerVersion | None:
     """
+    Retrieve details for a specific Lambda layer version.
+
     Ref:
 
     - `get_layer_version <https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/lambda/client/get_layer_version.html>`_
