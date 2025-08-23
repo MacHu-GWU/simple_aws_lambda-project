@@ -43,6 +43,9 @@ classifier = [
 # Core Dependencies
 # ------------------------------------------------------------------------------
 dependencies = [
+    "boto3>=1.35.99,<2.0.0",
+    "iterproxy>=0.3.1,<1.0.0",
+    "func_args>=1.0.1,<2.0.0",
 ]
 
 # ------------------------------------------------------------------------------
@@ -62,6 +65,7 @@ dev = [
     "wheel>=0.45.0,<1.0.0", # build wheel package
     "build>=1.2.1,<2.0.0", # build source distribution
     "rich>=13.8.1,<14.0.0", # pretty print
+    "boto3_stubs[lambda]>=1.35.99,<2.0.0", # boto3 lambda stubs for IDE autocompletion
 ]
 
 # ------------------------------------------------------------------------------
@@ -70,6 +74,7 @@ dev = [
 test = [
     "pytest>=8.2.2,<9.0.0", # Testing framework
     "pytest-cov>=6.0.0,<7.0.0", # Coverage reporting
+    "moto>=5.1.10,<6.0.0", # Mock AWS services for testing
 ]
 
 # ------------------------------------------------------------------------------
