@@ -74,6 +74,7 @@ dev = [
 test = [
     "pytest>=8.2.2,<9.0.0", # Testing framework
     "pytest-cov>=6.0.0,<7.0.0", # Coverage reporting
+    "s3pathlib>=2.0.1,<3.0.0", # for testing AWS S3
     "moto>=5.1.10,<6.0.0", # Mock AWS services for testing
 ]
 
