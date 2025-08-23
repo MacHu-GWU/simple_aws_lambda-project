@@ -50,7 +50,7 @@ Welcome to ``simple_aws_lambda`` Documentation
 .. image:: https://simple-aws-lambda.readthedocs.io/en/latest/_static/simple_aws_lambda-logo.png
     :target: https://simple-aws-lambda.readthedocs.io/en/latest/
 
-Documentation for ``simple_aws_lambda``.
+simple_aws_lambda is a Pythonic library that provides a simplified, high-level interface for AWS Lambda operations. Built on top of boto3, it offers intuitive data models, property-based access patterns, and comprehensive type hints to make working with AWS Lambda resources more developer-friendly and maintainable.
 
 
 .. _install:
