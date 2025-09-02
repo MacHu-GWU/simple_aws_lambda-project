@@ -14,6 +14,7 @@ def test():
     _ = api.list_layers
     _ = api.list_layer_versions
     _ = api.get_layer_version
+    _ = api.get_latest_layer_version
 
 
 if __name__ == "__main__":

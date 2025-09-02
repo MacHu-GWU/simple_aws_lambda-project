@@ -31,6 +31,7 @@ def list_layers(
     compatible_runtime: str = OPT,
     compatible_architecture: str = OPT,
     max_items: int = 9999,
+    page_size: int = 50,
 ) -> LayerIterproxy:
     """
     List available AWS Lambda layers in the account.
@@ -48,7 +49,7 @@ def list_layers(
                 CompatibleArchitecture=compatible_architecture,
                 PaginationConfig={
                     "MaxItems": max_items,
-                    "PageSize": 100,
+                    "PageSize": page_size,
                 },
             )
         )
@@ -65,9 +66,14 @@ def list_layer_versions(
     compatible_runtime: str = OPT,
     compatible_architecture: str = OPT,
     max_items: int = 9999,
-):
+    page_size: int = 50,
+) -> LayerVersionIterproxy:
     """
     List all versions of Lambda layers in the account.
+
+    .. note::
+
+        this API always returns the latest version first.
 
     Ref:
 
@@ -83,7 +89,7 @@ def list_layer_versions(
                 CompatibleArchitecture=compatible_architecture,
                 PaginationConfig={
                     "MaxItems": max_items,
-                    "PageSize": 100,
+                    "PageSize": page_size,
                 },
             )
         )
@@ -116,3 +122,33 @@ def get_layer_version(
         if e.response["Error"]["Code"] == "ResourceNotFoundException":
             return None
         raise  # pragma: no cover
+
+
+def get_latest_layer_version(
+    lambda_client: "LambdaClient",
+    layer_name: str,
+    compatible_runtime: str = OPT,
+    compatible_architecture: str = OPT,
+) -> LayerVersion | None:
+    """
+    Call the AWS Lambda Layer API to retrieve the latest deployed layer version.
+    If it returns ``None``, it indicates that no layer has been deployed yet.
+
+    Example: if layer has version 1, 2, 3, then this function return 3.
+    If there's no layer version created yet, then this function returns None.
+
+    Reference:
+
+    - https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/lambda.html#Lambda.Client.list_layer_versions
+    """
+    layer_versions = list_layer_versions(
+        lambda_client=lambda_client,
+        layer_name=layer_name,
+        compatible_runtime=compatible_runtime,
+        compatible_architecture=compatible_architecture,
+        max_items=1,
+    ).all()
+    if len(layer_versions) == 0:
+        return None
+    else:
+        return layer_versions[0]
