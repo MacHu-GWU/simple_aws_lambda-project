@@ -52,6 +52,14 @@ Welcome to ``simple_aws_lambda`` Documentation
 
 simple_aws_lambda is a Pythonic library that provides a simplified, high-level interface for AWS Lambda operations. Built on top of boto3, it offers intuitive data models, property-based access patterns, and comprehensive type hints to make working with AWS Lambda resources more developer-friendly and maintainable.
 
+**Key Features:**
+
+**Data Models** - Transform raw boto3 responses into Pythonic objects with property-based access, following the Raw Data Storage, Property-Based Access, and Core Data Extraction patterns to ensure API resilience and clean interfaces.
+
+**Better Client** - Enhance the standard boto3 Lambda client with idempotent operations, automatic pagination, better error handling, and direct return of data model objects instead of raw dictionaries.
+
+**Recipes** - Provide high-level functions for common Lambda layer management tasks such as version cleanup, cross-account access management, and intelligent layer discovery that combine multiple API calls with best practices.
+
 
 .. _install:
 

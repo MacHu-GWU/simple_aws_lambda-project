@@ -161,7 +161,9 @@ class Layer(Base):
 
     - `list_layers <https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/lambda/client/list_layers.html>`_
 
-    :param _data: Raw data structure as returned by AWS SDK::
+    :param _data: Raw data structure as returned by AWS SDK:
+
+    .. code-block:: python
 
         {
             'LayerName': 'string',
@@ -207,7 +209,9 @@ class Layer(Base):
 
 
 class LayerIterproxy(IterProxy[Layer]):
-    pass
+    """
+    Iterator proxy for collections of Layer objects with enhanced iteration capabilities.
+    """
 
 
 @dataclasses.dataclass(frozen=True)
@@ -215,7 +219,9 @@ class LayerContent(Base):
     """
     Represents the content details of a Lambda layer version.
 
-    :param _data: Raw data structure as returned by AWS SDK::
+    :param _data: Raw data structure as returned by AWS SDK:
+
+    .. code-block:: python
 
         {
             'Location': 'string',
@@ -273,7 +279,9 @@ class LayerVersion(Base):
     - `list_layer_versions <https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/lambda/client/list_layer_versions.html>`_
     - `get_layer_version <https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/lambda/client/get_layer_version.html>`_
 
-    :param _data: Raw data structure as returned by AWS SDK::
+    :param _data: Raw data structure as returned by AWS SDK:
+
+    .. code-block:: python
 
         {
             'LayerVersionArn': 'string',
@@ -471,4 +479,6 @@ class LayerVersion(Base):
 
 
 class LayerVersionIterproxy(IterProxy[LayerVersion]):
-    pass
+    """
+    Iterator proxy for collections of LayerVersion objects with enhanced iteration capabilities.
+    """

@@ -13,4 +13,5 @@ sub packages and modules
     api <api>
     client <client>
     model <model>
+    recipe <recipe>
     

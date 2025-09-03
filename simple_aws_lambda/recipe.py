@@ -130,8 +130,12 @@ def cleanup_old_layer_versions(
     return deleted_versions
 
 
-# See https://docs.aws.amazon.com/lambda/latest/dg/permissions-layer-cross-account.html
 class LambdaPermissionActionEnum(str, enum.Enum):
+    """
+    Enum for different Lambda layer permission actions.
+
+    See: https://docs.aws.amazon.com/lambda/latest/dg/permissions-layer-cross-account.html
+    """
     get_layer_version = "lambda:GetLayerVersion"
     list_layer_versions = "lambda:ListLayerVersions"
 
@@ -143,18 +147,32 @@ action_to_name_mapper: T.Dict[str, str] = {
 }
 
 
-# Based on this AWS doc https://docs.aws.amazon.com/lambda/latest/dg/permissions-layer-cross-account.html
-# There are only three cross account Lambda layer permission patterns
-# The grant_aws_account_or_aws_organization_lambda_layer_version_access
-# and revoke_aws_account_or_aws_organization_lambda_layer_version_access
-# recipes only support these three patterns
 class LayerPrincipalTypeEnum(str, enum.Enum):
+    """
+    Enum for different types of layer principals.
+
+    Based on this AWS doc https://docs.aws.amazon.com/lambda/latest/dg/permissions-layer-cross-account.html
+    There are only three cross account Lambda layer permission patterns
+    The grant_aws_account_or_aws_organization_lambda_layer_version_access
+    and revoke_aws_account_or_aws_organization_lambda_layer_version_access
+    recipes only support these three patterns.
+    """
     public = "public"
     aws_account = "aws_account"
     aws_organization = "aws_organization"
 
 
 def identify_principal_type(principal: str) -> LayerPrincipalTypeEnum:
+    """
+    Identify the type of principal based on its format.
+
+    :param principal: The principal string to identify:
+        - "*" for public access
+        - "123456789012" for specific AWS account (12-digit account ID)
+        - "o-example123456" for AWS organization ID
+
+    :returns: The identified LayerPrincipalTypeEnum
+    """
     if principal == "*":
         return LayerPrincipalTypeEnum.public
     elif principal.isdigit() and len(principal) == 12:
@@ -169,6 +187,9 @@ def get_layer_permission_statement_id(
     action: str,
     principal: str,
 ) -> str:
+    """
+    Encode the statement ID for Lambda layer permission based on action and principal.
+    """
     name = action_to_name_mapper[action]
     return f"allow-{principal}-{name}"
 
