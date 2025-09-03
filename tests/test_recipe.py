@@ -3,7 +3,15 @@
 from simple_aws_lambda.recipe import (
     get_latest_layer_version,
     cleanup_old_layer_versions,
+    LayerPrincipalTypeEnum,
+    identify_principal_type,
+    grant_aws_account_or_aws_organization_lambda_layer_version_access,
+    revoke_aws_account_or_aws_organization_lambda_layer_version_access,
 )
+
+import pytest
+import json
+import botocore.exceptions
 from simple_aws_lambda.client import (
     list_layer_versions,
 )
@@ -12,6 +20,18 @@ import sys
 from simple_aws_lambda.tests.mock_aws import BaseMockAwsTest
 
 py_ver = f"python{sys.version_info.major}.{sys.version_info.minor}"
+
+
+def test_identify_principal_type():
+    principal_type = identify_principal_type("*")
+    assert principal_type == LayerPrincipalTypeEnum.public
+
+    principal_type = identify_principal_type("111122223333")
+    assert principal_type == LayerPrincipalTypeEnum.aws_account
+
+    principal_type = identify_principal_type("o-1a2b3c")
+    assert principal_type == LayerPrincipalTypeEnum.aws_organization
+
 
 
 class Test(BaseMockAwsTest):
@@ -125,6 +145,71 @@ class Test(BaseMockAwsTest):
         assert len(remaining_versions) == 2
         remaining_version_numbers = [v.version for v in remaining_versions]
         assert remaining_version_numbers == [7, 6]
+
+    def test_grant_and_revoke_layer_permission(self):
+        lambda_client = self.bsm.lambda_client
+        layer_name = "test_layer_permission"
+        res = lambda_client.publish_layer_version(
+            LayerName=layer_name,
+            Content={
+                "ZipFile": b"version1",
+            },
+        )
+        layer_version = res["Version"]
+
+        # Grant access to specific AWS account
+        aws_account_id = "111122223333"
+
+        def grant():
+            grant_aws_account_or_aws_organization_lambda_layer_version_access(
+                lambda_client=lambda_client,
+                layer_name=layer_name,
+                version_number=layer_version,
+                principal=aws_account_id,
+            )
+
+        grant()
+
+        # Verify permission was added
+        response = lambda_client.get_layer_version_policy(
+            LayerName=layer_name,
+            VersionNumber=layer_version,
+        )
+        policy = json.loads(response["Policy"])
+        statements = policy["Statement"]
+        assert any(
+            stmt.get("Principal") == aws_account_id
+            and stmt.get("Action") == "lambda:GetLayerVersion"
+            for stmt in statements
+        )
+
+        # Revoke access from the AWS account
+        def revoke():
+            revoke_aws_account_or_aws_organization_lambda_layer_version_access(
+                lambda_client=lambda_client,
+                layer_name=layer_name,
+                version_number=layer_version,
+                principal=aws_account_id,
+            )
+
+        revoke()
+
+        # Verify permission was removed
+        try:
+            lambda_client.get_layer_version_policy(
+                LayerName=layer_name,
+                VersionNumber=layer_version,
+            )
+            raise AssertionError("Should have raised exception")
+        except botocore.exceptions.ClientError as e:
+            assert e.response["Error"]["Code"] == "ResourceNotFoundException"
+
+        grant()
+        grant()
+        revoke()
+        revoke()
+        revoke()
+        revoke()
 
 
 if __name__ == "__main__":

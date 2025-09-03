@@ -202,11 +202,13 @@ def grant_aws_account_or_aws_organization_lambda_layer_version_access(
     - `add_layer_version_permission <https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/lambda/client/add_layer_version_permission.html>`_
     """
     layer_principal_type = identify_principal_type(principal)
-    if layer_principal_type == LayerPrincipalTypeEnum.public:
+    if layer_principal_type == LayerPrincipalTypeEnum.public:  # pragma: no cover
         kwargs = {"Principal": principal}
-    elif layer_principal_type == LayerPrincipalTypeEnum.aws_account:
+    elif layer_principal_type == LayerPrincipalTypeEnum.aws_account:  # pragma: no cover
         kwargs = {"Principal": principal}
-    elif layer_principal_type == LayerPrincipalTypeEnum.aws_organization:
+    elif (
+        layer_principal_type == LayerPrincipalTypeEnum.aws_organization
+    ):  # pragma: no cover
         kwargs = {
             "Principal": "*",
             "OrganizationId": principal,
@@ -224,10 +226,10 @@ def grant_aws_account_or_aws_organization_lambda_layer_version_access(
                 LayerName=layer_name,
                 VersionNumber=version_number,
                 StatementId=statement_id,
-                Action=LambdaPermissionActionEnum.list_layer_versions.value,
+                Action=action,
                 **kwargs,
             )
-        except botocore.exceptions.ClientError as e:
+        except botocore.exceptions.ClientError as e:  # pragma: no cover
             if e.response["Error"]["Code"] == "ResourceConflictException":
                 pass
             else:
@@ -278,7 +280,7 @@ def revoke_aws_account_or_aws_organization_lambda_layer_version_access(
                 VersionNumber=version_number,
                 StatementId=statement_id,
             )
-        except botocore.exceptions.ClientError as e:
+        except botocore.exceptions.ClientError as e:  # pragma: no cover
             if e.response["Error"]["Code"] == "ResourceNotFoundException":
                 pass
             else:
