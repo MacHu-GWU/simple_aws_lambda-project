@@ -122,33 +122,3 @@ def get_layer_version(
         if e.response["Error"]["Code"] == "ResourceNotFoundException":
             return None
         raise  # pragma: no cover
-
-
-def get_latest_layer_version(
-    lambda_client: "LambdaClient",
-    layer_name: str,
-    compatible_runtime: str = OPT,
-    compatible_architecture: str = OPT,
-) -> LayerVersion | None:
-    """
-    Call the AWS Lambda Layer API to retrieve the latest deployed layer version.
-    If it returns ``None``, it indicates that no layer has been deployed yet.
-
-    Example: if layer has version 1, 2, 3, then this function return 3.
-    If there's no layer version created yet, then this function returns None.
-
-    Reference:
-
-    - https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/lambda.html#Lambda.Client.list_layer_versions
-    """
-    layer_versions = list_layer_versions(
-        lambda_client=lambda_client,
-        layer_name=layer_name,
-        compatible_runtime=compatible_runtime,
-        compatible_architecture=compatible_architecture,
-        max_items=1,
-    ).all()
-    if len(layer_versions) == 0:
-        return None
-    else:
-        return layer_versions[0]

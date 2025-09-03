@@ -32,6 +32,7 @@ by the native boto3 AWS Lambda API.
 
 import typing as T
 import dataclasses
+from datetime import datetime
 
 from func_args.api import T_KWARGS, REQ
 from iterproxy import IterProxy
@@ -348,6 +349,13 @@ class LayerVersion(Base):
         if content_data:
             return LayerContent(_data=content_data)
         return None
+
+    @property
+    def created_datetime(self) -> datetime:
+        """
+        Convert the created_date string to a datetime object.
+        """
+        return datetime.fromisoformat(self.created_date)
 
     @property
     def layer_name(self) -> str:
