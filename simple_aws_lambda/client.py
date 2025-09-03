@@ -67,9 +67,17 @@ def list_layer_versions(
     compatible_architecture: str = OPT,
     max_items: int = 9999,
     page_size: int = 50,
+    _sort_descending: bool = False,
 ) -> LayerVersionIterproxy:
     """
     List all versions of Lambda layers in the account.
+
+    :param _sort_descending: if True, load all layer versions in to memory and
+        then sort them in memory in descending order by version number. This is
+        the default behavior of official AWS API. However, the test tool moto does not
+        implement it correctly (it returns in ascending order). So this parameter
+        is a workaround for moto only. You don't need to set this parameter
+        when you run against real AWS API.
 
     .. note::
 
@@ -97,7 +105,17 @@ def list_layer_versions(
             for _data in response.get("LayerVersions", []):
                 yield LayerVersion(_data=_data)
 
-    return LayerVersionIterproxy(func())
+    if _sort_descending:
+        return LayerVersionIterproxy(
+            sorted(
+                func(),
+                key=lambda v: v.version,
+                reverse=True,
+            )
+        )
+    else:
+        return LayerVersionIterproxy(func())
+
 
 
 def get_layer_version(

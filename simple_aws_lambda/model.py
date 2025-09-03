@@ -32,7 +32,7 @@ by the native boto3 AWS Lambda API.
 
 import typing as T
 import dataclasses
-from datetime import datetime
+from datetime import datetime, timezone
 
 from func_args.api import T_KWARGS, REQ
 from iterproxy import IterProxy
@@ -355,7 +355,10 @@ class LayerVersion(Base):
         """
         Convert the created_date string to a datetime object.
         """
-        return datetime.fromisoformat(self.created_date)
+        dt = datetime.fromisoformat(self.created_date)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt
 
     @property
     def layer_name(self) -> str:

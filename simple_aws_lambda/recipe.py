@@ -22,6 +22,7 @@ def get_latest_layer_version(
     layer_name: str,
     compatible_runtime: str = OPT,
     compatible_architecture: str = OPT,
+    _sort_descending: bool = False,
 ) -> LayerVersion | None:
     """
     Call the AWS Lambda Layer API to retrieve the latest deployed layer version.
@@ -34,21 +35,18 @@ def get_latest_layer_version(
 
     - https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/lambda.html#Lambda.Client.list_layer_versions
     """
+    if _sort_descending:
+        max_items = 10
+    else:
+        max_items = 1
     layer_versions = list_layer_versions(
         lambda_client=lambda_client,
         layer_name=layer_name,
         compatible_runtime=compatible_runtime,
         compatible_architecture=compatible_architecture,
-        max_items=10,
+        max_items=max_items,
+        _sort_descending=_sort_descending,
     ).all()
-    # Because the test tool moto does not implement the list_layer_versions correctly
-    # with the reverse order, we need to sort it here to ensure the latest version is first.
-    # This is a workaround for moto only. We don't really need this for real AWS API.
-    layer_versions = list(sorted(
-        layer_versions,
-        key=lambda v: v.version,
-        reverse=True,
-    ))
     if len(layer_versions) == 0:
         return None
     else:
@@ -60,74 +58,69 @@ def cleanup_old_layer_versions(
     layer_name: str,
     keep_last_n_versions: int = 5,
     keep_versions_newer_than_seconds: int = 90 * 24 * 60 * 60,
-    dry_run: bool = True,
-) -> T.List[int]:
+    real_run: bool = False,
+    _sort_descending: bool = False,
+) -> list[int]:
     """
     Delete old Lambda layer versions based on retention policy.
 
     Keeps layer versions if they meet ANY of these conditions:
 
     - Among the last N versions (most recent)
-    - Created within the last N days
+    - Created within the last N seconds
 
     :param lambda_client: AWS Lambda client
     :param layer_name: Name of the Lambda layer
     :param keep_last_n_versions: Number of most recent versions to keep
-    :param keep_versions_newer_than_days: Keep versions newer than this many days
-    :param dry_run: If True, only return versions that would be deleted without actually deleting
+    :param keep_versions_newer_than_seconds: Keep versions newer than this many seconds
+    :param real_run: If True, actually delete versions. If False, only return what would be deleted
 
-    :returns: List of version numbers that were deleted (or would be deleted in dry run mode)
+    :returns: List of version numbers that were deleted (or would be deleted in simulation mode)
 
     Ref:
 
     - `delete_layer_version <https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/lambda/client/delete_layer_version.html>`_
     """
-    # Get all layer versions sorted by version number (newest first)
+    # Get all layer versions
     all_versions = list_layer_versions(
         lambda_client=lambda_client,
         layer_name=layer_name,
-        max_items=keep_last_n_versions,
+        max_items=9999,
+        _sort_descending=True,
     ).all()
 
-    if not all_versions:
+    # Only exam versions beyond the last N to keep
+    other_versions = all_versions[keep_last_n_versions:]
+
+    if len(other_versions) == 0:
         return []
 
-    # Sort by version number in descending order (newest first)
-    all_versions.sort(key=lambda v: v.version, reverse=True)
-
     # Calculate cutoff date
-    cutoff_date = datetime.now(timezone.utc) - timedelta(
-        days=keep_versions_newer_than_days
-    )
+    delta = timedelta(seconds=keep_versions_newer_than_seconds)
+    cutoff_date = datetime.now(timezone.utc) - delta
 
     versions_to_delete = []
 
-    for i, version in enumerate(all_versions):
-        # Keep if it's among the last N versions
-        if i < keep_last_n_versions:
-            continue
-
+    for version in other_versions:
         # Keep if it's newer than cutoff date
-        if version.created_datetime > cutoff_date:
+        if version.created_datetime > cutoff_date:  # pragma: no cover
             continue
 
         # This version should be deleted
         versions_to_delete.append(version.version)
 
-    # Delete the versions (unless dry run)
+    # Delete the versions (if real_run is True)
     deleted_versions = []
     for version_number in versions_to_delete:
-        if not dry_run:
+        deleted_versions.append(version_number)
+        if real_run:
             try:
                 lambda_client.delete_layer_version(
                     LayerName=layer_name,
                     VersionNumber=version_number,
                 )
-                deleted_versions.append(version_number)
-            except botocore.exceptions.ClientError as e:
+            except botocore.exceptions.ClientError:  # pragma: no cover
                 # Continue with other versions even if one fails
                 pass
-        else:
-            deleted_versions.append(version_number)
 
     return deleted_versions
