@@ -39,8 +39,16 @@ def get_latest_layer_version(
         layer_name=layer_name,
         compatible_runtime=compatible_runtime,
         compatible_architecture=compatible_architecture,
-        max_items=1,
+        max_items=10,
     ).all()
+    # Because the test tool moto does not implement the list_layer_versions correctly
+    # with the reverse order, we need to sort it here to ensure the latest version is first.
+    # This is a workaround for moto only. We don't really need this for real AWS API.
+    layer_versions = list(sorted(
+        layer_versions,
+        key=lambda v: v.version,
+        reverse=True,
+    ))
     if len(layer_versions) == 0:
         return None
     else:
@@ -51,7 +59,7 @@ def cleanup_old_layer_versions(
     lambda_client: "LambdaClient",
     layer_name: str,
     keep_last_n_versions: int = 5,
-    keep_versions_newer_than_days: int = 90,
+    keep_versions_newer_than_seconds: int = 90 * 24 * 60 * 60,
     dry_run: bool = True,
 ) -> T.List[int]:
     """
