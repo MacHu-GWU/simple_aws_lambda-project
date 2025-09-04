@@ -256,8 +256,8 @@ def grant_aws_account_or_aws_organization_lambda_layer_version_access(
             else:
                 raise
 
+    # Currently, AWS Lambda only supports granting GetLayerVersion permission
     add_layer_version_permission(LambdaPermissionActionEnum.get_layer_version.value)
-    add_layer_version_permission(LambdaPermissionActionEnum.list_layer_versions.value)
 
 
 def revoke_aws_account_or_aws_organization_lambda_layer_version_access(
@@ -307,7 +307,5 @@ def revoke_aws_account_or_aws_organization_lambda_layer_version_access(
             else:
                 raise
 
+    # Currently, AWS Lambda only supports granting GetLayerVersion permission
     remove_layer_version_permission(LambdaPermissionActionEnum.get_layer_version.value)
-    remove_layer_version_permission(
-        LambdaPermissionActionEnum.list_layer_versions.value
-    )
