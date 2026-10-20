@@ -77,3 +77,17 @@ To upgrade to latest version:
 .. code-block:: console
 
     $ pip install --upgrade simple-aws-lambda
+
+
+.. _use-with-ai-coding-agents:
+
+Use with AI Coding Agents
+------------------------------------------------------------------------------
+
+This repo ships an `Agent Skill <https://code.claude.com/docs/en/skills>`_ that documents the public API of ``simple_aws_lambda``, so an AI coding agent such as Claude Code can use the library without reading its source. It lives in `.claude/skills/simple_aws_lambda <https://github.com/MacHu-GWU/simple_aws_lambda-project/tree/main/.claude/skills/simple_aws_lambda>`_. To use it in your project, copy it into your project's ``.claude/skills/`` folder. Run this from your project's root:
+
+.. code-block:: console
+
+    $ git clone --depth 1 https://github.com/MacHu-GWU/simple_aws_lambda-project.git /tmp/simple_aws_lambda-project
+    $ mkdir -p .claude/skills
+    $ cp -R /tmp/simple_aws_lambda-project/.claude/skills/simple_aws_lambda .claude/skills/

@@ -10,7 +10,7 @@ Read ../pywf-oss-base/SKILL.md, then:
 
 ## Where to write the output
 
-Default to `~/.claude/skills/<package_name>/` (personal: usable in every project that installs the library). If the user clearly wants it project-only, use `.claude/skills/<package_name>/`. If the target directory exists, ask before overwriting.
+Write to `.claude/skills/<package_name>/` in this repo, and commit it: the skill ships with the source, and the README tells users how to copy it into their own projects. Never write to `~/.claude/skills/` unless the user asks. If the target directory exists, ask before overwriting.
 
 ## Step 1: Inspect the project
 
