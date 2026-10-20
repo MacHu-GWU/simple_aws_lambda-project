@@ -54,11 +54,11 @@ simple_aws_lambda is a Pythonic library that provides a simplified, high-level i
 
 **Key Features:**
 
-**Data Models** - Transform raw boto3 responses into Pythonic objects with property-based access, following the Raw Data Storage, Property-Based Access, and Core Data Extraction patterns to ensure API resilience and clean interfaces.
+`Data Models <https://simple-aws-lambda.readthedocs.io/en/latest/02-Data-Model/index.html>`_ - Transform raw boto3 responses into Pythonic objects with property-based access, following the Raw Data Storage, Property-Based Access, and Core Data Extraction patterns to ensure API resilience and clean interfaces.
 
-**Better Client** - Enhance the standard boto3 Lambda client with idempotent operations, automatic pagination, better error handling, and direct return of data model objects instead of raw dictionaries.
+`Better Client <https://simple-aws-lambda.readthedocs.io/en/latest/01-Quick-Start/index.html>`_ - Enhance the standard boto3 Lambda client with idempotent operations, automatic pagination, better error handling, and direct return of data model objects instead of raw dictionaries.
 
-**Recipes** - Provide high-level functions for common Lambda layer management tasks such as version cleanup, cross-account access management, and intelligent layer discovery that combine multiple API calls with best practices.
+`Recipes <https://simple-aws-lambda.readthedocs.io/en/latest/03-Cleanup-Old-Layer-Versions/index.html>`_ - Provide high-level functions for common Lambda layer management tasks such as version cleanup, cross-account access management, and intelligent layer discovery that combine multiple API calls with best practices.
 
 
 .. _install:

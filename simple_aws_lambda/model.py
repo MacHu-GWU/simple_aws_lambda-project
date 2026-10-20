@@ -66,7 +66,9 @@ class LatestMatchingLayerVersion(Base):
 
     - `list_layers <https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/lambda/client/list_layers.html>`_
 
-    :param _data: Raw data structure as returned by AWS SDK
+    :param _data: Raw data structure as returned by AWS SDK:
+
+    .. code-block:: python
 
         {
             'LayerVersionArn': 'string',

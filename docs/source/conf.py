@@ -22,14 +22,22 @@
 
 import os
 from datetime import datetime
-from email.utils import parseaddr
+from importlib.metadata import version as get_version
 from importlib.metadata import metadata
 
+# Get package metadata from installed package (via pyproject.toml)
 package_name = "simple_aws_lambda"
-package_metadata = metadata(package_name)
-# pyproject.toml lists authors as {name, email}, which lands in "Author-email"
-package_author = parseaddr(package_metadata["Author-email"])[0]
-package_version = package_metadata["Version"]
+_meta = metadata(package_name)
+
+# Extract version
+package_version = get_version(package_name)
+
+# Extract author from "Author-email: Name <email@example.com>" format
+_author_email_raw = _meta.get("Author-email", "")
+if _author_email_raw and "<" in _author_email_raw:
+    package_author = _author_email_raw.split("<")[0].strip()
+else:
+    package_author = _meta.get("Author", "Unknown")
 
 # -- General configuration ------------------------------------------------
 # If your documentation needs a minimal Sphinx version, state it here.
