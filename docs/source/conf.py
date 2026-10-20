@@ -22,11 +22,14 @@
 
 import os
 from datetime import datetime
-import simple_aws_lambda as package
+from email.utils import parseaddr
+from importlib.metadata import metadata
 
-package_name = package.__name__
-package_author = package.__author__
-package_version = package.__version__
+package_name = "simple_aws_lambda"
+package_metadata = metadata(package_name)
+# pyproject.toml lists authors as {name, email}, which lands in "Author-email"
+package_author = parseaddr(package_metadata["Author-email"])[0]
+package_version = package_metadata["Version"]
 
 # -- General configuration ------------------------------------------------
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -242,7 +245,6 @@ docfly.ApiDocGenerator(
         f"{package_name}.tests",
         f"{package_name}.vendor",
         # Module
-        f"{package_name}._version",
         f"{package_name}.paths",
     ],
 ).fly()

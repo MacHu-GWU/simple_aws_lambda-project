@@ -30,20 +30,22 @@ by users of the library. They provide a Pythonic interface to the JSON data retu
 by the native boto3 AWS Lambda API.
 """
 
+from __future__ import annotations
+
 import typing as T
 import dataclasses
-from datetime import datetime, timezone
+from datetime import datetime
+from datetime import timezone
 
-from func_args.api import T_KWARGS, REQ
+from func_args.api import T_KWARGS
+from func_args.api import REQ
 from iterproxy import IterProxy
 
 if T.TYPE_CHECKING:  # pragma: no cover
-    from mypy_boto3_lambda.type_defs import (
-        LayersListItemTypeDef,
-        LayerVersionsListItemTypeDef,
-        GetLayerVersionResponseTypeDef,
-        LayerVersionContentOutputTypeDef,
-    )
+    from mypy_boto3_lambda.type_defs import LayersListItemTypeDef
+    from mypy_boto3_lambda.type_defs import LayerVersionsListItemTypeDef
+    from mypy_boto3_lambda.type_defs import GetLayerVersionResponseTypeDef
+    from mypy_boto3_lambda.type_defs import LayerVersionContentOutputTypeDef
 
 
 @dataclasses.dataclass(frozen=True)
@@ -74,7 +76,7 @@ class LatestMatchingLayerVersion(Base):
         }
     """
 
-    _data: "LayerVersionsListItemTypeDef" = dataclasses.field(default=REQ)
+    _data: LayerVersionsListItemTypeDef = dataclasses.field(default=REQ)
 
     @property
     def layer_version_arn(self) -> str | None:
@@ -174,7 +176,7 @@ class Layer(Base):
         }
     """
 
-    _data: "LayersListItemTypeDef" = dataclasses.field(default=REQ)
+    _data: LayersListItemTypeDef = dataclasses.field(default=REQ)
 
     @property
     def layer_name(self) -> str:
@@ -232,7 +234,7 @@ class LayerContent(Base):
         }
     """
 
-    _data: "LayerVersionContentOutputTypeDef" = dataclasses.field()
+    _data: LayerVersionContentOutputTypeDef = dataclasses.field()
 
     @property
     def location(self) -> str | None:
@@ -306,7 +308,7 @@ class LayerVersion(Base):
     """
 
     # fmt: off
-    _data: T.Union["LayerVersionsListItemTypeDef", "GetLayerVersionResponseTypeDef"] = dataclasses.field(default=REQ)
+    _data: LayerVersionsListItemTypeDef | GetLayerVersionResponseTypeDef = dataclasses.field(default=REQ)
     # fmt: on
 
     @property

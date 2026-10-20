@@ -1,28 +1,30 @@
 # -*- coding: utf-8 -*-
 
+"""
+High-level recipes built on top of the client functions, such as finding the
+latest layer version, cleaning up old versions, and managing cross account access.
+"""
+
+from __future__ import annotations
+
 import typing as T
 import enum
-from datetime import datetime, timezone, timedelta
+from datetime import datetime
+from datetime import timezone
+from datetime import timedelta
 
 import botocore.exceptions
-from func_args.api import OPT, remove_optional
+from func_args.api import OPT
 
-from .model import (
-    LayerVersion,
-)
-from .client import (
-    list_layer_versions,
-)
+from .model import LayerVersion
+from .client import list_layer_versions
 
 if T.TYPE_CHECKING:  # pragma: no cover
     from mypy_boto3_lambda.client import LambdaClient
-    from mypy_boto3_lambda.type_defs import (
-        AddLayerVersionPermissionResponseTypeDef,
-    )
 
 
 def get_latest_layer_version(
-    lambda_client: "LambdaClient",
+    lambda_client: LambdaClient,
     layer_name: str,
     compatible_runtime: str = OPT,
     compatible_architecture: str = OPT,
@@ -58,7 +60,7 @@ def get_latest_layer_version(
 
 
 def cleanup_old_layer_versions(
-    lambda_client: "LambdaClient",
+    lambda_client: LambdaClient,
     layer_name: str,
     keep_last_n_versions: int = 5,
     keep_versions_newer_than_seconds: int = 90 * 24 * 60 * 60,
@@ -136,12 +138,13 @@ class LambdaPermissionActionEnum(str, enum.Enum):
 
     See: https://docs.aws.amazon.com/lambda/latest/dg/permissions-layer-cross-account.html
     """
+
     get_layer_version = "lambda:GetLayerVersion"
     list_layer_versions = "lambda:ListLayerVersions"
 
 
 # Map action to a more human friendly name for statement id naming convention
-action_to_name_mapper: T.Dict[str, str] = {
+action_to_name_mapper: dict[str, str] = {
     LambdaPermissionActionEnum.get_layer_version.value: "GetLayerVersion",
     LambdaPermissionActionEnum.list_layer_versions.value: "ListLayerVersions",
 }
@@ -157,6 +160,7 @@ class LayerPrincipalTypeEnum(str, enum.Enum):
     and revoke_aws_account_or_aws_organization_lambda_layer_version_access
     recipes only support these three patterns.
     """
+
     public = "public"
     aws_account = "aws_account"
     aws_organization = "aws_organization"
@@ -189,13 +193,20 @@ def get_layer_permission_statement_id(
 ) -> str:
     """
     Encode the statement ID for Lambda layer permission based on action and principal.
+
+    A statement ID may only contain ``[a-zA-Z0-9-_]``, so the public principal
+    ``"*"`` is written as ``public``.
     """
     name = action_to_name_mapper[action]
-    return f"allow-{principal}-{name}"
+    if principal == "*":
+        principal_part = "public"
+    else:
+        principal_part = principal
+    return f"allow-{principal_part}-{name}"
 
 
 def grant_aws_account_or_aws_organization_lambda_layer_version_access(
-    lambda_client: "LambdaClient",
+    lambda_client: LambdaClient,
     layer_name: str,
     version_number: int,
     principal: str,
@@ -207,8 +218,8 @@ def grant_aws_account_or_aws_organization_lambda_layer_version_access(
     automatically handles statement ID generation and manages conflicts by
     allowing existing permissions to remain.
 
-    Grants both GetLayerVersion and ListLayerVersions permissions to the specified
-    principal (AWS account, AWS organization, or public access).
+    Grants the GetLayerVersion permission to the specified principal
+    (AWS account, AWS organization, or public access).
 
     :param lambda_client: AWS Lambda client for the account that owns the layer
     :param layer_name: Name of the Lambda layer
@@ -223,13 +234,11 @@ def grant_aws_account_or_aws_organization_lambda_layer_version_access(
     - `add_layer_version_permission <https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/lambda/client/add_layer_version_permission.html>`_
     """
     layer_principal_type = identify_principal_type(principal)
-    if layer_principal_type == LayerPrincipalTypeEnum.public:  # pragma: no cover
+    if layer_principal_type == LayerPrincipalTypeEnum.public:
         kwargs = {"Principal": principal}
-    elif layer_principal_type == LayerPrincipalTypeEnum.aws_account:  # pragma: no cover
+    elif layer_principal_type == LayerPrincipalTypeEnum.aws_account:
         kwargs = {"Principal": principal}
-    elif (
-        layer_principal_type == LayerPrincipalTypeEnum.aws_organization
-    ):  # pragma: no cover
+    elif layer_principal_type == LayerPrincipalTypeEnum.aws_organization:
         kwargs = {
             "Principal": "*",
             "OrganizationId": principal,
@@ -261,7 +270,7 @@ def grant_aws_account_or_aws_organization_lambda_layer_version_access(
 
 
 def revoke_aws_account_or_aws_organization_lambda_layer_version_access(
-    lambda_client: "LambdaClient",
+    lambda_client: LambdaClient,
     layer_name: str,
     version_number: int,
     principal: str,
@@ -273,8 +282,8 @@ def revoke_aws_account_or_aws_organization_lambda_layer_version_access(
     automatically handles statement ID generation and gracefully handles cases
     where permissions don't exist.
 
-    Removes both GetLayerVersion and ListLayerVersions permissions from the
-    specified principal (AWS account, AWS organization, or public access).
+    Removes the GetLayerVersion permission from the specified principal
+    (AWS account, AWS organization, or public access).
 
     :param lambda_client: AWS Lambda client for the account that owns the layer
     :param layer_name: Name of the Lambda layer

@@ -209,6 +209,31 @@ class Test(BaseMockAwsTest):
         revoke()
         revoke()
 
+    def test_grant_and_revoke_public_and_organization(self):
+        lambda_client = self.lambda_client
+        layer_name = "test_layer_permission_public_and_org"
+        res = lambda_client.publish_layer_version(
+            LayerName=layer_name,
+            Content={
+                "ZipFile": b"version1",
+            },
+        )
+        layer_version = res["Version"]
+
+        for principal in ["*", "o-1a2b3c"]:
+            grant_aws_account_or_aws_organization_lambda_layer_version_access(
+                lambda_client=lambda_client,
+                layer_name=layer_name,
+                version_number=layer_version,
+                principal=principal,
+            )
+            revoke_aws_account_or_aws_organization_lambda_layer_version_access(
+                lambda_client=lambda_client,
+                layer_name=layer_name,
+                version_number=layer_version,
+                principal=principal,
+            )
+
 
 if __name__ == "__main__":
     from simple_aws_lambda.tests import run_cov_test

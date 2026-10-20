@@ -1,33 +1,32 @@
 # -*- coding: utf-8 -*-
 
 """
-Improve the original redshift boto3 API.
+Improve the original lambda boto3 API.
 
 Ref:
 
 - https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/lambda.html
 """
 
+from __future__ import annotations
+
 import typing as T
 
 import botocore.exceptions
-from func_args.api import OPT, remove_optional
+from func_args.api import OPT
+from func_args.api import remove_optional
 
-from .model import (
-    LatestMatchingLayerVersion,
-    Layer,
-    LayerContent,
-    LayerVersion,
-    LayerIterproxy,
-    LayerVersionIterproxy,
-)
+from .model import Layer
+from .model import LayerVersion
+from .model import LayerIterproxy
+from .model import LayerVersionIterproxy
 
 if T.TYPE_CHECKING:  # pragma: no cover
     from mypy_boto3_lambda.client import LambdaClient
 
 
 def list_layers(
-    lambda_client: "LambdaClient",
+    lambda_client: LambdaClient,
     compatible_runtime: str = OPT,
     compatible_architecture: str = OPT,
     max_items: int = 9999,
@@ -61,7 +60,7 @@ def list_layers(
 
 
 def list_layer_versions(
-    lambda_client: "LambdaClient",
+    lambda_client: LambdaClient,
     layer_name: str,
     compatible_runtime: str = OPT,
     compatible_architecture: str = OPT,
@@ -117,9 +116,8 @@ def list_layer_versions(
         return LayerVersionIterproxy(func())
 
 
-
 def get_layer_version(
-    lambda_client: "LambdaClient",
+    lambda_client: LambdaClient,
     layer_name: str,
     version_number: int,
 ) -> LayerVersion | None:

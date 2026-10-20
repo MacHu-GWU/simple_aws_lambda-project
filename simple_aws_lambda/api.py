@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 
+"""
+Public API. Users import from here::
+
+    from simple_aws_lambda.api import list_layers
+    import simple_aws_lambda.api as simple_aws_lambda
+"""
+
 from .model import LatestMatchingLayerVersion
 from .model import Layer
 from .model import LayerIterproxy

@@ -6,6 +6,8 @@ from simple_aws_lambda.model import Layer
 from simple_aws_lambda.model import LayerContent
 from simple_aws_lambda.model import LayerVersion
 
+from datetime import timezone
+
 import pytest
 
 
@@ -159,6 +161,17 @@ class TestLayerVersion:
         _ = obj.runtime_count
         _ = obj.architecture_count
         _ = obj.core_data
+
+        # CreatedDate with a timezone keeps it, one without is treated as UTC
+        assert obj.created_datetime.tzinfo is not None
+        obj_naive = LayerVersion(
+            _data={
+                "LayerVersionArn": "arn:aws:lambda:us-east-1:123456789012:layer:my-layer:1",
+                "Version": 1,
+                "CreatedDate": "2023-01-01T00:00:00",
+            }
+        )
+        assert obj_naive.created_datetime.tzinfo is timezone.utc
 
         # Test with no content and empty runtimes to cover false branches
         obj_empty = LayerVersion(
