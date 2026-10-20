@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
 
+from simple_aws_lambda.recipe import get_latest_layer_version
+from simple_aws_lambda.recipe import cleanup_old_layer_versions
+from simple_aws_lambda.recipe import LayerPrincipalTypeEnum
+from simple_aws_lambda.recipe import identify_principal_type
 from simple_aws_lambda.recipe import (
-    get_latest_layer_version,
-    cleanup_old_layer_versions,
-    LayerPrincipalTypeEnum,
-    identify_principal_type,
     grant_aws_account_or_aws_organization_lambda_layer_version_access,
+)
+from simple_aws_lambda.recipe import (
     revoke_aws_account_or_aws_organization_lambda_layer_version_access,
 )
 
-import pytest
-import json
-import botocore.exceptions
-from simple_aws_lambda.client import (
-    list_layer_versions,
-)
-
 import sys
+import json
+
+import botocore.exceptions
+
+from simple_aws_lambda.client import list_layer_versions
 from simple_aws_lambda.tests.mock_aws import BaseMockAwsTest
 
 py_ver = f"python{sys.version_info.major}.{sys.version_info.minor}"
@@ -33,12 +33,11 @@ def test_identify_principal_type():
     assert principal_type == LayerPrincipalTypeEnum.aws_organization
 
 
-
 class Test(BaseMockAwsTest):
     use_mock = True
 
     def test_get_latest_layer_version(self):
-        lambda_client = self.bsm.lambda_client
+        lambda_client = self.lambda_client
         layer_name = "recipe_get_latest_layer_version"
 
         # Test get_latest_layer_version with non-existent layer
@@ -49,7 +48,7 @@ class Test(BaseMockAwsTest):
         assert latest_layer is None
 
         # Create first layer version
-        res1 = lambda_client.publish_layer_version(
+        lambda_client.publish_layer_version(
             LayerName=layer_name,
             Content={
                 "ZipFile": b"version1",
@@ -67,7 +66,7 @@ class Test(BaseMockAwsTest):
         assert latest_layer.layer_name == layer_name
 
         # Create second layer version
-        res2 = lambda_client.publish_layer_version(
+        lambda_client.publish_layer_version(
             LayerName=layer_name,
             Content={
                 "ZipFile": b"version2",
@@ -75,7 +74,6 @@ class Test(BaseMockAwsTest):
         )
 
         # Test get_latest_layer_version returns latest version
-        print("**********")
         latest_layer = get_latest_layer_version(
             lambda_client=lambda_client,
             layer_name=layer_name,
@@ -85,7 +83,7 @@ class Test(BaseMockAwsTest):
         assert latest_layer.version == 2
 
     def test_cleanup_old_layer_versions(self):
-        lambda_client = self.bsm.lambda_client
+        lambda_client = self.lambda_client
         layer_name = "cleanup_old_layer_versions"
 
         # Test cleanup with non-existent layer
@@ -147,7 +145,7 @@ class Test(BaseMockAwsTest):
         assert remaining_version_numbers == [7, 6]
 
     def test_grant_and_revoke_layer_permission(self):
-        lambda_client = self.bsm.lambda_client
+        lambda_client = self.lambda_client
         layer_name = "test_layer_permission"
         res = lambda_client.publish_layer_version(
             LayerName=layer_name,

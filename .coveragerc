@@ -5,9 +5,9 @@ omit =
     simple_aws_lambda/docs/*
     simple_aws_lambda/tests/*
     simple_aws_lambda/vendor/*
-    simple_aws_lambda/_version.py
     simple_aws_lambda/cli.py
     simple_aws_lambda/paths.py
+    simple_aws_lambda/_version.py
 
 [report]
 # Regexes for lines to exclude from consideration

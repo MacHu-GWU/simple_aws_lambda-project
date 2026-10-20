@@ -1,16 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from simple_aws_lambda.client import (
-    list_layers,
-    list_layer_versions,
-    get_layer_version,
-)
+from simple_aws_lambda.client import list_layers
+from simple_aws_lambda.client import list_layer_versions
+from simple_aws_lambda.client import get_layer_version
 
 import sys
-from simple_aws_lambda.model import (
-    Layer,
-    LayerVersion,
-)
+
+from simple_aws_lambda.model import LayerVersion
 from simple_aws_lambda.tests.mock_aws import BaseMockAwsTest
 
 py_ver = f"python{sys.version_info.major}.{sys.version_info.minor}"
@@ -20,7 +16,7 @@ class Test(BaseMockAwsTest):
     use_mock = True
 
     def test_layer(self):
-        lambda_client = self.bsm.lambda_client
+        lambda_client = self.lambda_client
         layer_name = "my_app"
 
         # Test get_layer_version with non-existent layer

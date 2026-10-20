@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import pytest
+from simple_aws_lambda.model import Base
+from simple_aws_lambda.model import LatestMatchingLayerVersion
+from simple_aws_lambda.model import Layer
+from simple_aws_lambda.model import LayerContent
+from simple_aws_lambda.model import LayerVersion
 
-from simple_aws_lambda.model import (
-    Base,
-    LatestMatchingLayerVersion,
-    Layer,
-    LayerContent,
-    LayerVersion,
-)
+import pytest
 
 
 class TestBase:
