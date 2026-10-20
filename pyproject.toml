@@ -2,7 +2,7 @@
 [project]
 name = "simple_aws_lambda"
 # Bump before each release (https://semver.org/), then ``mise run inst`` to update ``uv.lock``.
-version = "0.2.2"
+version = "0.3.1"
 description = "Objective Oriented Python SDK for AWS Lambda."
 # An SPDX license expression (PEP 639); keep ``LICENSE.txt`` in sync.
 # Read: https://packaging.python.org/en/latest/guides/writing-pyproject-toml/#license-and-license-files

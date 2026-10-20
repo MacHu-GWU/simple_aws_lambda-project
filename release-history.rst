@@ -15,6 +15,27 @@ x.y.z (Backlog)
 **Miscellaneous**
 
 
+0.3.1 (2026-10-20)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**Breaking Changes**
+
+- Drop Python 3.10, which reaches end of life in October 2026. The minimum is now Python 3.11.
+- Remove ``simple_aws_lambda.__version__`` and the other package metadata attributes (``__author__``, ``__license__``, and so on) from the package root. Read the version with ``importlib.metadata.version("simple_aws_lambda")`` instead.
+
+**Minor Improvements**
+
+- Support Python 3.14. CI now tests Python 3.11 to 3.14.
+
+**Bugfixes**
+
+- Fix ``grant_aws_account_or_aws_organization_lambda_layer_version_access`` and ``revoke_aws_account_or_aws_organization_lambda_layer_version_access`` with the public principal ``"*"``: the permission statement id contained ``*``, which AWS rejects. The public grant now uses the statement id ``allow-public-GetLayerVersion``.
+
+**Miscellaneous**
+
+- Rewrite the documentation as runnable guides: Quick Start, Data Model, Cleanup Old Layer Versions, Cross Account Layer Access, and Design Notes.
+- Move the development workflow from Poetry to uv and mise.
+
+
 0.2.2 (2025-09-04)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 **Bugfixes**
